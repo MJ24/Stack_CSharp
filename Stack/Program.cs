@@ -10,19 +10,27 @@ namespace Stack
     {
         static void Main(string[] args)
         {
+            IStack<int> intSequenceStack = new SequenceStack<int>(50);
+            IStack<char> charSequenceStack = new SequenceStack<char>(50);
+            IStack<double> doubleSequenceStack = new SequenceStack<double>(50);
+
+            IStack<int> intLinkStack = new LinkStack<int>();
+            IStack<char> charLinkStack = new LinkStack<char>();
+            IStack<double> doubleLinkStack = new LinkStack<double>();
+
             #region 十进制转n进制
-            Console.WriteLine("十进制的8转为二进制的值为: {0}",DecimalConvert(8, 2));
+            Console.WriteLine("十进制的8转为二进制的值为: {0}", DecimalConvert(8, 2, intLinkStack));
             #endregion
 
             #region 根据表达式求后缀表达式，和根据后缀表达式计算其值
             //示例：a*b+(c-d/e)*f 转为 ab*cde/-f*+
             Console.WriteLine();
             Console.WriteLine("原表达式为：\n{0}", "a*b+(c-d/e)*f");
-            Console.WriteLine("转换为后缀表达式为：\n{0}", GetPostFixExpression("a*b+(c-d/e)*f"));
+            Console.WriteLine("转换为后缀表达式为：\n{0}", GetPostFixExpression("a*b+(c-d/e)*f", charLinkStack));
 
             Console.WriteLine();
             string postFixExpression = "3 7 * 4 17 3 / - 8 * +".Trim();
-            Console.WriteLine("后缀表达式“{0}”的计算结果为：\n{1}", postFixExpression, GetPostFixExpValue(postFixExpression)); 
+            Console.WriteLine("后缀表达式“{0}”的计算结果为：\n{1}", postFixExpression, GetPostFixExpValue(postFixExpression, doubleLinkStack));
             #endregion
 
             Console.ReadLine();
@@ -30,7 +38,7 @@ namespace Stack
 
         //十进制转n进制，因为其原理为除n取余然后逆序输出余数
         //所以正好符合栈的先进后出
-        private static int DecimalConvert(int num, int decimalTo)
+        private static int DecimalConvert(int num, int decimalTo, IStack<int> stack)
         {
             if (decimalTo < 1)
             {
@@ -38,7 +46,6 @@ namespace Stack
                 return -1;
             }
             string strResult = null;
-            SequenceStack<int> stack = new SequenceStack<int>(32);
             //num一开始就为0时，下面两个while都跳过，Convert.ToInt32(null)返回0
             while (num != 0)
             {
@@ -53,7 +60,7 @@ namespace Stack
         }
 
         //根据表达式求后缀表达式
-        private static string GetPostFixExpression(string originExp)
+        private static string GetPostFixExpression(string originExp, IStack<char> stack)
         {
             string result = null;
             if (string.IsNullOrEmpty(originExp))
@@ -64,7 +71,6 @@ namespace Stack
             {
                 string operators = "+-*/()";
                 char[] originExpArray = originExp.ToArray();
-                SequenceStack<char> stack = new SequenceStack<char>(24);
                 //遍历原表达式中每一个字符，是运算数则给结果表达式
                 //是运算符则判断，如果是)则从栈顶开始遍历，把最近的(之上的运算符都弹出给结果表达式,()本身不要管
                 //对于其他运算符如果当前运算符优先级低于栈顶运算符则把栈顶运算符弹出并给结果表达式
@@ -121,7 +127,7 @@ namespace Stack
         }
 
         //根据后缀表达式求表达式的值
-        private static double GetPostFixExpValue(string expression)
+        private static double GetPostFixExpValue(string expression, IStack<double> stack)
         {
             double result = -1.0;
             if (string.IsNullOrEmpty(expression))
@@ -132,7 +138,6 @@ namespace Stack
             {
                 string[] expArray = expression.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                 string operators = "+-*/";
-                SequenceStack<double> stack = new SequenceStack<double>(24);
                 //遍历后缀表达式，如果是运算数则压栈，是运算符则把栈顶两个元素弹栈并按运算符和顺序进行运算
                 //再把运算结果压栈，遍历完后，栈中仅剩的就是运算结果
                 foreach (string item in expArray)
