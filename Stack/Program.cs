@@ -18,8 +18,26 @@ namespace Stack
             IStack<char> charLinkStack = new LinkStack<char>();
             IStack<double> doubleLinkStack = new LinkStack<double>();
 
+            #region 验证括号是否匹配
+            Console.WriteLine(IsValidExpression("(()[]{}", charSequenceStack));
+            charSequenceStack.Clear();
+            Console.WriteLine(IsValidExpression("()[]{}(", charSequenceStack));
+            charSequenceStack.Clear();
+            Console.WriteLine(IsValidExpression("([{}])", charSequenceStack));
+            charSequenceStack.Clear();
+            Console.WriteLine(IsValidExpression("()[{}", charLinkStack));
+            charLinkStack.Clear();
+            Console.WriteLine(IsValidExpression("[)[]{}", charLinkStack));
+            charLinkStack.Clear();
+            Console.WriteLine(IsValidExpression("([]{})]", charLinkStack));
+            charLinkStack.Clear();
+            Console.WriteLine(IsValidExpression("([]{})", charLinkStack));
+            charLinkStack.Clear();
+            #endregion
+
             #region 十进制转n进制
             Console.WriteLine("十进制的8转为二进制的值为: {0}", DecimalConvert(8, 2, intLinkStack));
+            intLinkStack.Clear();
             #endregion
 
             #region 根据表达式求后缀表达式，和根据后缀表达式计算其值
@@ -27,13 +45,55 @@ namespace Stack
             Console.WriteLine();
             Console.WriteLine("原表达式为：\n{0}", "a*b+(c-d/e)*f");
             Console.WriteLine("转换为后缀表达式为：\n{0}", GetPostFixExpression("a*b+(c-d/e)*f", charLinkStack));
+            charLinkStack.Clear();
 
             Console.WriteLine();
             string postFixExpression = "3 7 * 4 17 3 / - 8 * +".Trim();
             Console.WriteLine("后缀表达式“{0}”的计算结果为：\n{1}", postFixExpression, GetPostFixExpValue(postFixExpression, doubleLinkStack));
+            doubleLinkStack.Clear();
             #endregion
 
             Console.ReadLine();
+        }
+
+        //验证括号是否匹配,如输入"()[]{}("返回false，"()[]{}"返回true
+        private static bool IsValidExpression(string s, IStack<char> stack)
+        {
+            bool result = true;
+            for (int i = 0; i < s.Length; i++)
+            {
+                switch (s[i])
+                {
+                    case '(':
+                    case '[':
+                    case '{':
+                        stack.Push(s[i]);
+                        break;
+                    case ')':
+                        if (stack.IsEmpty() || stack.Pop() != '(')
+                        {
+                            return false;
+                        }
+                        break;
+                    case ']':
+                        if (stack.IsEmpty() || stack.Pop() != '[')
+                        {
+                            return false;
+                        }
+                        break;
+                    case '}':
+                        if (stack.IsEmpty() || stack.Pop() != '{')
+                        {
+                            return false;
+                        }
+                        break;
+                }
+            }
+            if (result)
+            {
+                result = stack.IsEmpty();
+            }
+            return result;
         }
 
         //十进制转n进制，因为其原理为除n取余然后逆序输出余数
